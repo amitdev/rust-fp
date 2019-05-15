@@ -1,0 +1,1130 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Functional Programming in Rust</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/n.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		<script src="js/Chart.bundle.min.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+          <h3> Introduction to </h3> <h2>Functional Programming</h2> <h3> in Rust </h3>
+          <p>Amit Dev (<a href="https://github.com/amitdev">github.com/amitdev</a> 
+          <a href="https://twitter.com/amitdevr">@amitdevr</a>)</p>
+        </section>
+
+        <section>
+          <h2> What is Functional Programming? </h2>
+          <img class="fragment" src="images/funprog.png">
+        </section>
+
+        <section>
+          <ul>
+          <li> Values + Pure functions</li>
+          <li class="fragment"> Composition </li>
+          <li class="fragment"> Reasoning </li>
+          </ul>
+        </section>
+
+        <section data-background="images/lego.jpg">
+        </section>
+
+        <section data-background="#ffffff">
+          <img src="images/sim.png" style="width:45%;height:45%;border:0;" />
+          <img class="fragment" src="images/sl.jpeg" style="width:45%;height:45%;border:0;" />
+        </section>
+
+        <section data-background="#ffffff">
+          <img src="images/rust.png" style="width:50%;height:50%;border:0;" />
+        </section>
+
+				<section>
+					<blockquote>
+						&ldquo;A language that doesn't affect the way you think about programming, is not worth knowing&rdquo;
+					</blockquote>
+          <small>Alan Perlis</small>
+				</section>
+
+        <section>
+          <h2> Why Rust </h2>
+          <img src="images/whyrust.png">
+        </section>
+
+				<section>
+					<blockquote>
+            &ldquo;Zero-overhead principle:<br>
+What you don’t use, you don’t pay for, And further:
+What you do use, you couldn’t hand code any better.&rdquo;
+					</blockquote>
+          <small>Bjarne Stroustrup - Foundations of C++</small>
+				</section>
+
+        <section>
+          <img src="images/typing.jpg" style="width:45%;height:45%;" >
+          <small> https://twitter.com/01k/status/1067788059989684224 </small>
+        </section>
+
+        <section>
+          <h2> Key Features </h2>
+          <ul>
+          <li> Strongly Static Typed </li>
+          <li class="fragment"> Type Inference </li>
+          <li class="fragment">Based on Linear Types </li>
+          <li class="fragment"> Region based memory management</li>
+          </ul>
+        </section>
+
+        <section data-background="images/dive.jpg">
+        </section>
+
+        <section>
+          <h2> Ownership model </h2>
+        </section>
+
+        <section>
+          <h2> Immutable by default</h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="2-3">
+            fn main() {
+              let x = 3;
+              x = 5;
+            }
+            </code>
+          </pre>
+          <pre class="fragment">
+            <code class="html" data-trim>error[E0384]: cannot assign twice to immutable variable `x`
+  |
+2 |     let x = 3;
+  |         -
+  |         |
+  |         first assignment to `x`
+  |         help: make this binding mutable: `mut x`
+3 |     x = 5;
+  |     ^^^^^ cannot assign twice to immutable variable
+
+error: aborting due to previous error
+For more information about this error, try `rustc --explain E0384`.
+            </code>
+          </pre>
+        </section>
+
+
+        <section>
+          <h2> Move Semantics </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-5">
+            fn main() {
+              let x = String::from("hello");
+              let y = x;
+              println!("x={}, y={}", x, y);
+            }
+            </code>
+          </pre>
+          <pre class="fragment">
+          <code class="html">error[E0382]: borrow of moved value: `x`
+  |
+2 |  let x = String::from("hello");
+  |     - move occurs because `x` has type `std::string::String`,
+          which does not implement the `Copy` trait
+3 |  let y = x;
+  |     - value moved here
+4 |  println!("x={}, y={}", x, y);
+  |                         ^ value borrowed here after move
+
+error: aborting due to previous error
+For more information about this error, try `rustc --explain E0382`.
+          </code></pre>
+        </section>
+
+        <section>
+          <h2> Clone </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-5">
+            fn main() {
+              let x = String::from("hello");
+              let y = x.clone();
+              println!("x={}, y={}", x, y);
+            }
+            </code>
+            </code>
+          </pre>
+          <pre class="fragment"><code>x=hello, y=hello</code></pre>
+        </section>
+
+        <section>
+          <h2> Copy Trait </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="2-4">
+            fn main() {
+              let x = 3;
+              let y = x;
+              println!("x={}, y={}", x, y);
+            }
+            </code>
+          </pre>
+          <pre class="fragment"><code>x=3, y=3</code></pre>
+        </section>
+
+        <section>
+          <h2> Mutable + Ownership</h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-5">
+            fn append_newline(original: String) -&gt; String {
+              let mut result = original;
+              result.push_str("\n");
+              result
+            }
+
+            fn main() {
+              let x = String::from("Hello");
+              let y = append_newline(x);
+              println!("{}", y);
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Mutable + Ownership</h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-11">
+            fn append_newline(original: String) -&gt; String {
+              let mut result = original;
+              result.push_str("\n");
+              result
+            }
+
+            fn main() {
+              let x = String::from("Hello");
+              let y = append_newline(x);
+              println!("{}", y);
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> References </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-10">
+            fn len(s: String) -&gt; usize {
+              s.len()
+            }
+
+            fn main() {
+              let x = String::from("hello");
+              println!("{}", len(x));
+              println!("{}", x);
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> References </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-10">
+            fn len(s: &amp;String) -&gt; usize {
+              s.len()
+            }
+
+            fn main() {
+              let x = String::from("hello");
+              println!("{}", len(&amp;x));
+              println!("{}", x);
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Mutable References </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-10">
+            fn len(s: &amp;mut String) -&gt; usize {
+              s.len()
+            }
+
+            fn main() {
+              let x = String::from("hello");
+              println!("{}", len(&amp;mut x));
+              println!("{}", x);
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Ownership Overview </h2>
+          <ul>
+          <li> Every value has a single owner, when owner goes out of scope the value is dropped.</li>
+          <li class="fragment"> There can be <em>either</em> one mutable reference or any number of immutable references. </li>
+          <li class="fragment"> References have lifetimes. </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2> Basic types </h2>
+
+					<table>
+						<thead>
+							<tr>
+								<th>Type</th>
+								<th>Builtin</th>
+								<th>Example</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td rowspan="2">Integer</td>
+                <td><pre>u8 | u16 | u32 | u64 | u128 </pre></td>
+                <td><pre>2</pre></td>
+							</tr>
+							<tr>
+                <td><pre>i8 | i16 | i32 | i64 | i128 </pre></td>
+                <td><pre>-2, 0xff</pre></td>
+							</tr>
+							<tr>
+								<td>Floating Point</td>
+                <td><pre>f32 | f64</pre></td>
+                <td><pre>1.23</pre></td>
+							</tr>
+							<tr>
+								<td>Character</td>
+                <td><pre>char</pre></td>
+                <td><pre>'a','ℤ', '😻'</pre></td>
+							</tr>
+							<tr>
+								<td>Boolean</td>
+                <td><pre>bool</pre></td>
+                <td><pre>true, false</pre></td>
+							</tr>
+						</tbody>
+          </table>
+        </section>
+
+        <section>
+          <h2> Algebraic Data Types </h2>
+        </section>
+
+        <section>
+          <h2> 0 values</h2>
+          <style>
+          .grid {
+            display: flex;
+          }
+          .col {
+            flex: 1;
+            padding: 5px;
+          }
+          </style>
+          <div class="grid">
+            <div class="col">
+              Rust
+              <pre><code>enum Void {}</code></pre>
+            </div>
+            <div class="col">
+              Haskell
+              <pre><code>data Void</code></pre>
+            </div>
+        </section>
+
+        <section>
+          <h2> 1 value </h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <td><pre><code data-trim>
+          enum Unit {
+            Unit 
+          }</code> or <code>()</code></pre>
+            </div>
+            <div class="col">
+          Haskell
+          <pre><code>data Unit = Unit</code> or <code>()</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2> 1 + 1</h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <pre><code data-trim>
+          enum Direction {
+            Up,
+            Down
+          }</code> or <code>bool</code></pre>
+            </div>
+            <div class="col">
+          Haskell
+          <pre><code>data Direction = Up | Down</code> or <code>Boolean</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2> 1 + A</h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <pre><code data-trim>
+          enum Option&lt;A&gt; {
+            Some(A),
+            None
+          }</code></pre>
+          </div>
+            <div class="col">
+          Haskell
+          <pre><code>data Maybe a = Just a | Nothing</code></pre>
+            </div>
+            </div>
+        </section>
+
+        <section>
+          <h2> A + B</h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <pre><code data-trim>
+          enum Result&lt;A, B&gt; {
+            Ok(A),
+            Err(B)
+          }</code></pre>
+          </div>
+            <div class="col">
+          Haskell
+          <pre><code>data Either a b = Left a | Right b</code></pre>
+          </div>
+          </div>
+        </section>
+
+        <section>
+          <h2> A * B</h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <pre><code data-trim>
+          (A, B)
+          //or
+          struct Tuple { a: A, b: B }
+          </code></pre>
+            </div>
+          <div class="col">
+          Haskell
+          <pre><code>data (a, b) = (a, b)</code></pre>
+          </div>
+          </div>
+        </section>
+
+        <section>
+          <h2> L = 1 + AL</h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <pre><code data-trim>
+          enum List&lt;A&gt; {
+            Nil,
+            Cons(A, List&lt;A&gt;)
+          }
+          </code></pre>
+            </div>
+          <div class="col">
+          Haskell
+          <pre><code>data List a =
+            Nil | 
+            Cons a (List a)</code></pre>
+          </div>
+          </div>
+          <pre class="fragment"><code class="text" data-trim>
+error[E0072]: recursive type `List` has infinite size
+ --&gt; src/main.rs:1:1
+  |
+1 | enum List&lt;A&gt; {
+  | ^^^^^^^^^^^^ recursive type has infinite size
+2 |     Nil,
+3 |     Cons(A, List&lt;A&gt;)
+  |             ------- recursive without indirection
+  |
+  = help: insert indirection (e.g., a `Box`, `Rc`, or `&amp;`) at
+          some point to make `List` representable
+          </code></pre>
+        </section>
+
+        <section>
+          <h2> L = 1 + AL</h2>
+          <div class="grid">
+            <div class="col">
+          Rust
+          <pre><code data-trim>
+          enum List&lt;A&gt; {
+            Nil,
+            Cons(A, Box&lt;List&lt;A&gt;&gt;)
+          }
+          </code></pre>
+            </div>
+          <div class="col">
+          Haskell
+          <pre><code>data List a =
+            Nil | 
+            Cons a (List a)</code></pre>
+          </div>
+          </div>
+        </section>
+
+        <section>
+          <h2> Pattern Matching </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-12">
+            struct Person {
+              name: String,
+              address: Option&lt;String&gt;
+            }
+            //...
+            match person {
+              Person { name, address : Some(s) }
+                =&gt; (name, s.len()),
+              Person { name, address : None}
+                =&gt; (name, 0)
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Pattern Matching </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-10">
+            fn age_type(age: Option&lt;i32&gt;) -&gt; &amp;'static str {
+              match age {
+                Some(val) if val &lt; 0   =&gt; "Negative",
+                Some(val @ 0 ... 18)   =&gt; "Less than 18",
+                Some(val) if val &gt; 150 =&gt; "Over 150",
+                Some(val)              =&gt; "Adult",
+                None                   =&gt; "Empty"
+              }
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Traits </h2>
+          <pre class="fragment">
+            <code class="hljs" data-trim data-line-numbers="1-3">
+            pub trait Clone {
+             fn clone(&amp;self) -&gt; Self;
+            }
+
+            impl Clone for MyStruct {
+             fn clone(&amp;self) -&gt; Self {
+              ...
+             }
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Traits </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-9">
+            pub trait Clone {
+             fn clone(&amp;self) -&gt; Self;
+            }
+
+            impl Clone for MyStruct {
+             fn clone(&amp;self) -&gt; Self {
+              ...
+             }
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Traits </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-4">
+            use std::ops;
+
+            #[derive(Debug)]
+            struct Point(i64, i64);
+
+            impl ops::Add&lt;Point&gt; for Point {
+              type Output = Point;
+              fn add(self, other: Point) -&gt; Point {
+                Point(self.0 + other.0, self.1 + other.1)
+              }
+            }
+
+            fn main() {
+              println!("{:?}", Point(1, 2) + Point(2, 1)); // Point(3,3)
+            }
+          </code>
+          </pre>
+        </section>
+        <section>
+          <h2> Traits </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-15">
+            use std::ops;
+
+            #[derive(Debug)]
+            struct Point(i64, i64);
+
+            impl ops::Add&lt;Point&gt; for Point {
+              type Output = Point;
+              fn add(self, other: Point) -&gt; Point {
+                Point(self.0 + other.0, self.1 + other.1)
+              }
+            }
+
+            fn main() {
+              println!("{:?}", Point(1, 2) + Point(2, 1)); // Point(3,3)
+            }
+          </code>
+          </pre>
+        </section>
+
+
+        <section>
+          <h2> Traits </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-3">
+            pub trait TimeDuration {
+              fn days(&amp;self) -&gt; Duration;
+            }
+
+            impl TimeDuration for i64 {
+              fn days(&amp;self) -&gt; Duration {
+                Duration::days(*self)
+              }
+            }
+
+            date + 3.days();
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Traits </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-9">
+            pub trait TimeDuration {
+              fn days(&amp;self) -&gt; Duration;
+            }
+
+            impl TimeDuration for i64 {
+              fn days(&amp;self) -&gt; Duration {
+                Duration::days(*self)
+              }
+            }
+
+            date + 3.days();
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Traits </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="11">
+            pub trait TimeDuration {
+              fn days(&amp;self) -&gt; Duration;
+            }
+
+            impl TimeDuration for i64 {
+              fn days(&amp;self) -&gt; Duration {
+                Duration::days(*self)
+              }
+            }
+
+            date + 3.days() // Add 3 days to the given date
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Factorial - Take 1 </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1">
+              fn factorial(n: u64) -&gt; u64 {
+                match n {
+                  0 | 1 =&gt; 1,
+                  n     =&gt; n * factorial(n - 1),
+                }
+              }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Factorial - Take 1 </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-6">
+              fn factorial(n: u64) -&gt; u64 {
+                match n {
+                  0 | 1 =&gt; 1,
+                  n     =&gt; n * factorial(n - 1),
+                }
+              }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Closures </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-2">
+              let square = |a| a * a;
+              square(3); // 9
+
+              let mul = |a, b| a * b;
+              mul(2, 3); // 6
+
+              let x = 5;
+              let add5 = |y| x + y;
+              add5(10); // 15
+
+              let side_effecty = || { ... };
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Closures </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="4-5">
+              let square = |a| a * a;
+              square(3); // 9
+
+              let mul = |a, b| a * b;
+              mul(2, 3); // 6
+
+              let x = 5;
+              let add5 = |y| x + y;
+              add5(10); // 15
+
+              let side_effecty = || { ... };
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Closures </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="7-9">
+              let square = |a| a * a;
+              square(3); // 9
+
+              let mul = |a, b| a * b;
+              mul(2, 3); // 6
+
+              let x = 5;
+              let add5 = |y| x + y;
+              add5(10); // 15
+
+              let side_effecty = || { ... };
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Closures </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="11">
+              let square = |a| a * a;
+              square(3); // 9
+
+              let mul = |a, b| a * b;
+              mul(2, 3); // 6
+
+              let x = 5;
+              let add5 = |y| x + y;
+              add5(10); // 15
+
+              let side_effecty = || { ... };
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Factorial - Take 2 </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-3">
+            fn factorial(n: u64) -&gt; u64 {
+              (1..n+1).fold(1, |acc, i| acc * i)
+            }
+            </code>
+          </pre>
+          <fragment>
+          <pre class="fragment">
+            <code class="hljs" data-trim data-line-numbers="1-5">
+            use std::ops::Mul;
+
+            fn factorial(n: u64) -&gt; u64 {
+              (1..n+1).fold(1, Mul::mul)
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Factorial - Take 3 </h2>
+          <div class="grid">
+            <div class="col">
+          <pre>
+            <code class="hljs" data-trim>
+            fn factorial(n: u64) -&gt; u64 {
+              (1..n+1).product()
+            }
+            </code>
+          </pre>
+          </div>
+          <div class="col">
+          <span class="fragment"> 
+          <pre>
+            <code class="hljs" data-trim>
+            factorial n = product [1..n]
+            </code>
+          </pre>
+          </span>
+          </div></div>
+        </section>
+
+        <section>
+          <h2> Higher order functions</h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-4">
+            fn apply&lt;F, A, B&gt;(f: F, arg: A) -&gt; B
+            where F: Fn(A) -&gt; B {
+              f(arg)
+            }
+
+            fn square(a: i32) -&gt; i32 { a * a }
+
+            // apply can take another function as argument
+            let n: i32 = apply(square, 4);    // n = 16
+            // apply can also take a closure as argument
+            let n: i32 = apply(|x| x * x, 4); // n = 16
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Higher order functions</h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-11">
+            fn apply&lt;F, A, B&gt;(f: F, arg: A) -&gt; B
+            where F: Fn(A) -&gt; B {
+              f(arg)
+            }
+
+            fn square(a: i32) -&gt; i32 { a * a }
+
+            // apply can take another function as argument
+            let n: i32 = apply(square, 4);    // n = 16
+            // apply can also take a closure as argument
+            let n: i32 = apply(|x| x * x, 4); // n = 16
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Fn Trait Family </h2>
+          <ul>
+            <li class="fragment"><b>FnOnce</b><br>
+            Can be called only once. Closure takes ownership of captured variables</li>
+            <li class="fragment"><b>FnMut</b><br>
+            Mutable borrows values and can change the environment</li>
+            <li class="fragment"><b>Fn</b><br>
+            Immutably borrows values from the environment</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2> Compose</h2>
+          f: X &rarr; Y, g: Y &rarr; Z <br> (g ∘ f): X &rarr; Z
+          <pre class="fragment">
+            <code class="rust" data-trim>
+            fn compose&lt;X, Y, Z, F, G&gt;(f: F, g: G) -&gt; Fn(X) -&gt; Z
+            where F: Fn(X) -&gt; Y, G: Fn(Y) -&gt; Z {
+              |x| g(f(x))
+            }
+            </code>
+          </pre>
+          <pre class="fragment"><code class="text" data-trim>
+  |
+1 | fn compose&lt;X, Y, Z, F, G&gt;(f: F, g: G) -&gt; Fn(X) -&gt; Z
+  |                                          ^^^^^^^^^^
+  |                    doesn't have a size known at compile-time
+          </code></pre>
+        </section>
+
+        <section>
+          <h2> Compose</h2>
+          f: X &rarr; Y, g: Y &rarr; Z <br> (g ∘ f): X &rarr; Z
+          <pre>
+            <code class="rust" data-trim>
+            fn compose&lt;X, Y, Z, F, G&gt;(f: F, g: G) -&gt; impl Fn(X) -&gt; Y
+            where F: Fn(X) -&gt; Y, G: Fn(Y) -&gt; Z {
+              |x| g(f(x))
+            }
+            </code>
+          </pre>
+          <pre class="fragment"><code class="text" data-trim>
+error[E0373]: closure may outlive the current function, but it
+borrows `g`, which is owned by the current function
+  |
+3 |     |x| g(f(x))
+  |     ^^^ - `g` is borrowed here
+  |     |
+  |     may outlive borrowed value `g`
+  |
+note: closure is returned here
+          </code></pre>
+        </section>
+
+        <section>
+          <h2> Compose</h2>
+          f: X &rarr; Y, g: Y &rarr; Z <br> (g ∘ f): X &rarr; Z
+          <pre>
+            <code class="rust" data-trim>
+            fn compose&lt;X, Y, Z, F, G&gt;(f: F, g: G) -&gt; impl Fn(X) -&gt; Y
+            where F: Fn(X) -&gt; Y, G: Fn(Y) -&gt; Z {
+              move |x| g(f(x))
+            }
+            </code>
+          </pre>
+        </section>
+
+        <section>
+          <h2> Iterator </h2>
+          <pre>
+            <code class="rust" data-trim>
+            data.lines()
+              .filter(|line| line.contains(query))
+              .map(str::to_lowercase)
+              .take(2)
+              .collect()
+            }
+            </code>
+          </pre>
+        </section>
+        <section>
+          <h2> Quick Sort </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="1-10">
+fn qsort&lt;T&gt;(lst: Vec&lt;T&gt;) -&gt; Vec&lt;T&gt;
+where T: PartialOrd {
+  if lst.len() == 0 {
+      return lst;
+  }
+  let pivot = lst[0];
+  let (lo, hi) = partition(lst, pivot);
+  let (left, right) = (qsort(lo), qsort(hi));
+  appended(left, pivot, right)
+}
+          </code></pre>
+        </section>
+        <section>
+          <h2> Parallel Quick Sort </h2>
+          <pre>
+            <code class="hljs" data-trim data-line-numbers="2,8">
+fn qsort&lt;T&gt;(lst: Vec&lt;T&gt;) -&gt; Vec&lt;T&gt;
+where T: PartialOrd + Send {
+  if lst.len() == 0 {
+      return lst;
+  }
+  let pivot = lst[0];
+  let (lo, hi) = partition(lst, pivot);
+  let (left, right) = rayon::join(|| qsort(lo), || qsort(hi));
+  appended(left, pivot, right)
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <h2> Is Rust a good functional programming language?</h2>
+        </section>
+
+        <section>
+					<table>
+						<tbody>
+							<tr>
+								<td>Safe/Total functions</td>
+                <td><span>&#10003;</span></td>
+							</tr>
+							<tr class="fragment">
+								<td>Algebraic data types</td>
+                <td><span>&#10003;</span></td>
+							</tr>
+							<tr class="fragment">
+								<td>Immutability/Values</td>
+                <td><span>&#10003;</span></td>
+							</tr>
+							<tr class="fragment">
+								<td>Higher order functions</td>
+                <td><span>&#8722;</span></td>
+							</tr>
+							<tr class="fragment">
+								<td>Advanced functional abstractions</td>
+                <td><span>&#8722;</span></td>
+							</tr>
+							<tr class="fragment">
+								<td>Pure functions</td>
+                <td><span>&#10005;</span></td>
+							</tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h2> Should I use Rust? </h2>
+        </section>
+
+        <section>
+          <h2> Domain </h2>
+          <img src="images/domains.png">
+        </section>
+
+        <section>
+          <canvas data-chart="radar">
+<!--
+{
+  "data": {
+    "labels": [
+      "Functional Programming", "Performance", "Maturity", "Community", "Documentation", "Safety", "Ease of Learning"
+    ],
+    "datasets": [{
+      "label": "Java",
+      "backgroundColor": "rgba(255,99,132,0.2)",
+      "borderColor": "rgb(255,99,132)",
+      "pointBackgroundColor": "rgb(255,99,132)",
+      "data": [
+        30,
+        70,
+        90,
+        70,
+        90,
+        75,
+        60
+      ]
+    }, {
+      "label": "Haskell",
+      "hidden": true,
+      "backgroundColor": "rgba(54,162,235,0.2)",
+      "borderColor": "rgb(54,162,235)",
+      "pointBackgroundColor": "rgb(54,162,235)",
+      "data": [
+        100,
+        50,
+        70,
+        70,
+        80,
+        90,
+        50
+      ]
+    },{
+      "label": "Rust",
+      "hidden": true,
+      "backgroundColor": "rgba(75,192,192,0.2)",
+      "borderColor": "rgb(75,192,192)",
+      "pointBackgroundColor": "rgb(75,192,192)",
+      "data": [
+        70,
+        100,
+        40,
+        80,
+        80,
+        90,
+        45
+      ]
+    }
+    ]
+  },
+  "options": {
+    "legend": {
+    "position": "right",
+      "labels": {
+        "fontColor": "white"
+      }
+    },
+    "scale": {
+      "ticks": {
+        "beginAtZero": true,
+        "display": false
+      },
+      "pointLabels": {
+        "fontColor": "white",
+        "fontStyle": "bold"
+      },
+      "gridLines": {
+        "color": "rgba(255, 255, 255, 0.2)"
+      },
+      "angleLines": {
+        "color": "white"
+      }
+    }
+  }
+}
+-->
+</canvas>
+        </section>
+
+        <section>
+					<blockquote>
+						&ldquo;We shape our tools and afterwards our tools shape us&rdquo;
+					</blockquote>
+          <small> - Marshall McLuhan </small>
+        </section>
+
+        <section>
+          <h2> Thank You</h2>
+          <h2> Questions? </h2>
+          <p><a href="https://github.com/amitdev">github.com/amitdev</a></p>
+          <p><a href="https://twitter.com/amitdevr">@amitdevr</a></p>
+        </section>
+
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+
+				transition: 'fade',
+        hash: true,
+
+				dependencies: [
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true },
+          { src: 'plugin/chart/Chart.min.js' },
+		      { src: 'plugin/chart/csv2chart.js' }
+				]
+			});
+		</script>
+	</body>
+</html>
