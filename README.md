@@ -1,1 +1,1 @@
-Slides for the talk given at YOW! LambdaJam 2019.
+Slides for the talk I gave at [YOW! LambdaJam 2019](https://lambdajam.yowconference.com.au/program/).
